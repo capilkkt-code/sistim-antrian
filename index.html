@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistem Antrian Digital</title>
+    <title>Antrian Dukcapil Kabupaten Kepulauan Tanimbar</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
         :root {
@@ -55,6 +55,27 @@
             max-width: 1200px;
             margin: 0 auto;
             padding: 20px;
+        }
+
+        .tv-mode .container {
+            max-width: 100%;
+            padding: 10px;
+        }
+
+        .tv-mode {
+            font-size: 1.2em;
+        }
+
+        .tv-mode .current-number {
+            font-size: 6rem !important;
+        }
+
+        .tv-mode .stat-number {
+            font-size: 3rem !important;
+        }
+
+        .tv-mode .queue-status {
+            font-size: 1.8rem !important;
         }
 
         header {
@@ -477,6 +498,132 @@
         .hidden {
             display: none !important;
         }
+
+        .video-section {
+            background: var(--bg-card);
+            border-radius: 25px;
+            padding: 30px;
+            box-shadow: var(--shadow-neumorphic);
+            margin-top: 30px;
+        }
+
+        .video-container h3 {
+            margin-bottom: 20px;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .video-player {
+            background: var(--bg-secondary);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .video-player video {
+            width: 100%;
+            max-width: 800px;
+            height: auto;
+            border-radius: 10px;
+            box-shadow: var(--shadow-medium);
+        }
+
+        .video-controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .video-btn {
+            background: var(--bg-secondary);
+            border: none;
+            border-radius: 12px;
+            padding: 12px 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: var(--shadow-neumorphic);
+            color: var(--text-primary);
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .video-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-heavy);
+        }
+
+        .video-btn.active {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+        }
+
+        .volume-control {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: var(--bg-secondary);
+            padding: 10px 15px;
+            border-radius: 12px;
+            box-shadow: var(--shadow-neumorphic-inset);
+        }
+
+        .volume-control input[type="range"] {
+            width: 100px;
+            height: 5px;
+            border-radius: 5px;
+            background: var(--bg-primary);
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        .volume-control input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 15px;
+            height: 15px;
+            border-radius: 50%;
+            background: var(--primary-color);
+            cursor: pointer;
+        }
+
+        .volume-control input[type="range"]::-moz-range-thumb {
+            width: 15px;
+            height: 15px;
+            border-radius: 50%;
+            background: var(--primary-color);
+            cursor: pointer;
+            border: none;
+        }
+
+        .tv-mode .main-content {
+            grid-template-columns: 2fr 1fr;
+        }
+
+        .tv-mode .video-section {
+            display: block !important;
+        }
+
+        @media (max-width: 1024px) {
+            .tv-mode .main-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .video-controls {
+                justify-content: flex-start;
+            }
+            
+            .volume-control {
+                width: 100%;
+                justify-content: space-between;
+            }
+        }
     </style>
 </head>
 <body>
@@ -484,7 +631,7 @@
         <header>
             <div class="logo">
                 <i class="fas fa-users"></i>
-                <h1>Sistem Antrian Digital</h1>
+                <h1>Antrian Dukcapil Kabupaten Kepulauan Tanimbar</h1>
             </div>
             <div class="header-controls">
                 <button class="theme-toggle" onclick="toggleTheme()">
@@ -498,6 +645,14 @@
                 <button class="theme-toggle" onclick="toggleAudio()">
                     <i class="fas fa-volume-up"></i>
                     <span>Audio ON</span>
+                </button>
+                <button class="theme-toggle" onclick="toggleTVMode()">
+                    <i class="fas fa-tv"></i>
+                    <span>TV Mode</span>
+                </button>
+                <button class="theme-toggle" onclick="toggleVideoPlayer()">
+                    <i class="fas fa-play-circle"></i>
+                    <span>Video Player</span>
                 </button>
             </div>
         </header>
@@ -548,6 +703,43 @@
             </section>
         </main>
 
+        <!-- Video Player Section -->
+        <section class="video-section" id="videoSection" style="display: none;">
+            <div class="video-container">
+                <h3><i class="fas fa-play-circle"></i> Video Player</h3>
+                <div class="video-player">
+                    <video id="videoPlayer" controls muted>
+                        <source src="" type="video/mp4">
+                        Video tidak dapat diputar di browser ini.
+                    </video>
+                </div>
+                <div class="video-controls">
+                    <input type="file" id="videoFile" accept="video/*" style="display: none;">
+                    <button class="video-btn" onclick="selectVideo()">
+                        <i class="fas fa-folder-open"></i>
+                        Pilih Video
+                    </button>
+                    <button class="video-btn" onclick="playPauseVideo()">
+                        <i class="fas fa-play" id="playPauseIcon"></i>
+                        <span id="playPauseText">Play</span>
+                    </button>
+                    <button class="video-btn" onclick="stopVideo()">
+                        <i class="fas fa-stop"></i>
+                        Stop
+                    </button>
+                    <button class="video-btn" onclick="toggleMute()">
+                        <i class="fas fa-volume-up" id="muteIcon"></i>
+                        <span id="muteText">Mute</span>
+                    </button>
+                    <div class="volume-control">
+                        <i class="fas fa-volume-down"></i>
+                        <input type="range" id="volumeSlider" min="0" max="100" value="50">
+                        <i class="fas fa-volume-up"></i>
+                    </div>
+                </div>
+            </div>
+        </section>
+
         <section class="admin-panel" id="adminPanel">
             <h2><i class="fas fa-user-shield"></i> Panel Admin</h2>
             <div class="admin-controls">
@@ -575,6 +767,20 @@
         </section>
     </div>
 
+    <!-- Footer -->
+    <footer style="background: var(--bg-card); border-radius: 20px; padding: 20px; margin-top: 30px; text-align: center; box-shadow: var(--shadow-neumorphic); color: var(--text-secondary);">
+        <div style="display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 10px;">
+            <i class="fas fa-building" style="color: var(--primary-color);"></i>
+            <span style="font-weight: 600;">Dinas Kependudukan dan Pencatatan Sipil</span>
+        </div>
+        <div style="font-size: 0.9rem;">
+            Kabupaten Kepulauan Tanimbar
+        </div>
+        <div style="margin-top: 10px; font-size: 0.8rem; opacity: 0.8;">
+            © 2025 Dinas Kependudukan dan Pencatatan Sipil Kabupaten Kepulauan Tanimbar
+        </div>
+    </footer>
+
     <!-- Modal for ticket -->
     <div class="modal" id="ticketModal">
         <div class="modal-content">
@@ -584,7 +790,12 @@
                 <i class="fas fa-qrcode"></i>
             </div>
             <p>Simpan nomor ini dan tunggu panggilan</p>
-            <button class="close-modal" onclick="closeModal()">Tutup</button>
+            <div style="display: flex; gap: 15px; justify-content: center; margin-top: 20px;">
+                <button class="close-modal" onclick="printTicket()" style="background: linear-gradient(135deg, var(--success-color), #22c55e);">
+                    <i class="fas fa-print"></i> Print Tiket
+                </button>
+                <button class="close-modal" onclick="closeModal()">Tutup</button>
+            </div>
         </div>
     </div>
 
@@ -603,7 +814,9 @@
             isAdminMode: false,
             startTime: Date.now(),
             audioEnabled: true,
-            voiceEnabled: true
+            voiceEnabled: true,
+            tvMode: false,
+            videoPlayerVisible: false
         };
 
         // Load state from localStorage
@@ -989,6 +1202,7 @@
             loadState();
             updateDisplay();
             updateAudioButton();
+            updateButtonStates();
             requestNotificationPermission();
             
             // Load voices for speech synthesis
@@ -1010,8 +1224,257 @@
             }
         }
 
+        // Toggle TV Mode
+        function toggleTVMode() {
+            queueState.tvMode = !queueState.tvMode;
+            const body = document.body;
+            const button = document.querySelectorAll('.theme-toggle')[2]; // Third button is TV mode
+            
+            if (queueState.tvMode) {
+                body.classList.add('tv-mode');
+                button.style.background = 'linear-gradient(135deg, var(--success-color), #22c55e)';
+                button.style.color = 'white';
+                showNotification('Mode TV diaktifkan - Optimal untuk layar besar');
+            } else {
+                body.classList.remove('tv-mode');
+                button.style.background = 'var(--bg-secondary)';
+                button.style.color = 'var(--text-primary)';
+                showNotification('Mode TV dinonaktifkan');
+            }
+            saveState();
+        }
+
+        // Toggle Video Player
+        function toggleVideoPlayer() {
+            queueState.videoPlayerVisible = !queueState.videoPlayerVisible;
+            const videoSection = document.getElementById('videoSection');
+            const button = document.querySelectorAll('.theme-toggle')[3]; // Fourth button is video player
+            
+            if (queueState.videoPlayerVisible) {
+                videoSection.style.display = 'block';
+                button.style.background = 'linear-gradient(135deg, var(--primary-color), var(--secondary-color))';
+                button.style.color = 'white';
+                showNotification('Video Player diaktifkan');
+            } else {
+                videoSection.style.display = 'none';
+                button.style.background = 'var(--bg-secondary)';
+                button.style.color = 'var(--text-primary)';
+                showNotification('Video Player disembunyikan');
+            }
+            saveState();
+        }
+
+        // Select Video File
+        function selectVideo() {
+            document.getElementById('videoFile').click();
+        }
+
+        // Handle video file selection
+        document.addEventListener('DOMContentLoaded', function() {
+            const videoFile = document.getElementById('videoFile');
+            const videoPlayer = document.getElementById('videoPlayer');
+            const volumeSlider = document.getElementById('volumeSlider');
+            
+            videoFile.addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    const url = URL.createObjectURL(file);
+                    videoPlayer.src = url;
+                    showNotification(`Video "${file.name}" berhasil dimuat`);
+                }
+            });
+            
+            // Volume control
+            volumeSlider.addEventListener('input', function() {
+                videoPlayer.volume = this.value / 100;
+            });
+            
+            // Set initial volume
+            videoPlayer.volume = 0.5;
+        });
+
+        // Play/Pause Video
+        function playPauseVideo() {
+            const video = document.getElementById('videoPlayer');
+            const icon = document.getElementById('playPauseIcon');
+            const text = document.getElementById('playPauseText');
+            
+            if (video.paused) {
+                video.play();
+                icon.className = 'fas fa-pause';
+                text.textContent = 'Pause';
+            } else {
+                video.pause();
+                icon.className = 'fas fa-play';
+                text.textContent = 'Play';
+            }
+        }
+
+        // Stop Video
+        function stopVideo() {
+            const video = document.getElementById('videoPlayer');
+            const icon = document.getElementById('playPauseIcon');
+            const text = document.getElementById('playPauseText');
+            
+            video.pause();
+            video.currentTime = 0;
+            icon.className = 'fas fa-play';
+            text.textContent = 'Play';
+        }
+
+        // Toggle Mute
+        function toggleMute() {
+            const video = document.getElementById('videoPlayer');
+            const icon = document.getElementById('muteIcon');
+            const text = document.getElementById('muteText');
+            const volumeSlider = document.getElementById('volumeSlider');
+            
+            if (video.muted) {
+                video.muted = false;
+                icon.className = 'fas fa-volume-up';
+                text.textContent = 'Mute';
+                volumeSlider.value = video.volume * 100;
+            } else {
+                video.muted = true;
+                icon.className = 'fas fa-volume-mute';
+                text.textContent = 'Unmute';
+                volumeSlider.value = 0;
+            }
+        }
+
+        // Update button states on load
+        function updateButtonStates() {
+            // Update TV Mode button
+            if (queueState.tvMode) {
+                document.body.classList.add('tv-mode');
+                const tvButton = document.querySelectorAll('.theme-toggle')[2];
+                tvButton.style.background = 'linear-gradient(135deg, var(--success-color), #22c55e)';
+                tvButton.style.color = 'white';
+            }
+            
+            // Update Video Player button
+            if (queueState.videoPlayerVisible) {
+                document.getElementById('videoSection').style.display = 'block';
+                const videoButton = document.querySelectorAll('.theme-toggle')[3];
+                videoButton.style.background = 'linear-gradient(135deg, var(--primary-color), var(--secondary-color))';
+                videoButton.style.color = 'white';
+            }
+        }
+
+        // Print Ticket Function
+        function printTicket() {
+            const ticketNumber = document.getElementById('ticketNumber').textContent;
+            const currentDate = new Date().toLocaleDateString('id-ID', {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+            const currentTime = new Date().toLocaleTimeString('id-ID');
+            
+            const printContent = `
+                <html>
+                <head>
+                    <title>Tiket Antrian - ${ticketNumber}</title>
+                    <style>
+                        body {
+                            font-family: 'Courier New', monospace;
+                            margin: 0;
+                            padding: 20px;
+                            background: white;
+                            color: black;
+                        }
+                        .ticket {
+                            width: 300px;
+                            margin: 0 auto;
+                            border: 2px dashed #333;
+                            padding: 20px;
+                            text-align: center;
+                        }
+                        .header {
+                            border-bottom: 1px solid #333;
+                            padding-bottom: 15px;
+                            margin-bottom: 15px;
+                        }
+                        .logo {
+                            font-size: 24px;
+                            font-weight: bold;
+                            margin-bottom: 10px;
+                        }
+                        .office-name {
+                            font-size: 12px;
+                            line-height: 1.4;
+                            margin-bottom: 5px;
+                        }
+                        .ticket-number {
+                            font-size: 48px;
+                            font-weight: bold;
+                            margin: 20px 0;
+                            letter-spacing: 3px;
+                        }
+                        .info {
+                            font-size: 11px;
+                            margin: 5px 0;
+                        }
+                        .footer {
+                            border-top: 1px solid #333;
+                            padding-top: 15px;
+                            margin-top: 15px;
+                            font-size: 10px;
+                        }
+                        @media print {
+                            body { margin: 0; padding: 10px; }
+                            .ticket { width: 100%; border: 2px dashed #000; }
+                        }
+                    </style>
+                </head>
+                <body>
+                    <div class="ticket">
+                        <div class="header">
+                            <div class="logo">🏛️ DUKCAPIL</div>
+                            <div class="office-name">
+                                DINAS KEPENDUDUKAN DAN<br>
+                                PENCATATAN SIPIL<br>
+                                KABUPATEN KEPULAUAN TANIMBAR
+                            </div>
+                        </div>
+                        
+                        <div class="content">
+                            <div style="font-size: 14px; margin-bottom: 10px;">NOMOR ANTRIAN</div>
+                            <div class="ticket-number">${ticketNumber}</div>
+                            
+                            <div class="info">Tanggal: ${currentDate}</div>
+                            <div class="info">Waktu: ${currentTime}</div>
+                            <div class="info">Status: Menunggu Panggilan</div>
+                        </div>
+                        
+                        <div class="footer">
+                            <div>Simpan tiket ini sampai dipanggil</div>
+                            <div>Terima kasih atas kunjungan Anda</div>
+                            <div style="margin-top: 10px;">© 2025 Dukcapil Kab. Kep. Tanimbar</div>
+                        </div>
+                    </div>
+                </body>
+                </html>
+            `;
+            
+            const printWindow = window.open('', '_blank');
+            printWindow.document.write(printContent);
+            printWindow.document.close();
+            
+            // Wait for content to load then print
+            printWindow.onload = function() {
+                printWindow.print();
+                printWindow.onafterprint = function() {
+                    printWindow.close();
+                };
+            };
+            
+            showNotification('Tiket sedang dicetak...');
+        }
+
         // Initialize when page loads
         document.addEventListener('DOMContentLoaded', init);
     </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9811d07f91e5a030',t:'MTc1ODIwODY5MS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9813cdd5336dc6f3',t:'MTc1ODIyOTU1NC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
